@@ -9,6 +9,7 @@ CREATE TABLE users (
 	phone_number VARCHAR(12),
 	address VARCHAR(255),
 	nic VARCHAR(15),
+	role VARCHAR(10),
 	hashed_password VARCHAR(255) NOT NULL,
 	created_dttm TIMESTAMP,
 	updated_dttm TIMESTAMP,
