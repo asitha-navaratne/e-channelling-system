@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from datetime import datetime
 from enum import Enum
@@ -27,6 +28,7 @@ def get_db():
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
+## Types
 class Titles(Enum):
     mr = 'Mr.'
     mrs = 'Mrs.'
@@ -46,7 +48,20 @@ class CreateUserRequest(BaseModel):
     nic: str
     password: str
 
-@router.post('/', status_code = status.HTTP_201_CREATED)
+## Helpers
+def authenticate_user(email: str, password: str, db: db_dependency):
+    user = db.query(User).filter(User.email == email).first()
+
+    if not user:
+        return False
+    
+    if not bcrypt_context.verify(password, user.hashed_password):
+        return False
+    
+    return True
+
+## Routes
+@router.post('/register', status_code = status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
     create_user_model = User(
         email = create_user_request.email,
@@ -64,3 +79,11 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
 
     db.add(create_user_model)
     db.commit()
+
+@router.post('/login')
+async def get_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency):
+    user = authenticate_user(form_data.username, form_data.password, db)
+
+    if not user:
+        return 'Failed authentication'
+    return 'Successful authentication'
