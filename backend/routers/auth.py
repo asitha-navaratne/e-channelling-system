@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from datetime import datetime
 from enum import Enum
+from passlib.context import CryptContext
 
 from database.models import User
 
@@ -10,6 +11,8 @@ router = APIRouter(
     prefix='/auth',
     tags=['auth']
 )
+
+bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 class Titles(Enum):
     mr = 'Mr.'
@@ -46,7 +49,7 @@ async def create_user(create_user_request: CreateUserRequest):
         address = create_user_request.address,
         nic = create_user_request.nic,
         user_role = create_user_request.user_role,
-        hashed_password = create_user_request.password,
+        hashed_password = bcrypt_context.hash(create_user_request.password),
         created_dttm = datetime.now(),
         updated_dttm = datetime.now()
     )
