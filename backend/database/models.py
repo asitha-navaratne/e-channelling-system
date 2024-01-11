@@ -1,8 +1,9 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
 
 from database.config import Base
 
-class Users(Base):
+
+class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -18,7 +19,7 @@ class Users(Base):
     created_dttm = Column(DateTime)
     updated_dttm = Column(DateTime)
 
-class Doctors(Base):
+class Doctor(Base):
     __tablename__ = 'doctors'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -37,16 +38,16 @@ class Availability(Base):
     __tablename__ = 'availability'
 
     id = Column(Integer, primary_key=True, index=True)
-    doctor_id = Column(Integer, index=True)
+    doctor_id = Column(Integer, ForeignKey('doctors.id'), index=True)
     start_time = Column(DateTime)
     end_time = Column(DateTime)
     created_dttm = Column(DateTime)
 
-class Appointments(Base):
+class Appointment(Base):
     __tablename__ = 'appointments'
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, index=True)
-    doctor_id = Column(Integer, index=True)
+    user_id = Column(Integer, ForeignKey('users.id'), index=True)
+    doctor_id = Column(Integer, ForeignKey('doctors.id'), index=True)
     appointment_dttm = Column(DateTime)
     created_dttm = Column(DateTime)

@@ -5,6 +5,9 @@ from sqlalchemy.orm import Session
 import database.models as models
 from database.config import engine, SessionLocal
 
+from routers import auth
+
+
 app = FastAPI()
 
 models.Base.metadata.create_all(bind=engine)
@@ -17,6 +20,8 @@ def get_db():
         db.close()
 
 db_dependency = Annotated[Session, Depends(get_db)]
+
+app.include_router(auth.router)
 
 @app.get('/')
 def root():
