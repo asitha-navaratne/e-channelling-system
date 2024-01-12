@@ -23,7 +23,7 @@ router = APIRouter(
 )
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl='login')
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/login')
 
 def get_db():
     db = SessionLocal()
@@ -115,7 +115,7 @@ async def get_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], 
     user = authenticate_user(form_data.username, form_data.password, db)
 
     if not user:
-        return 'Failed authentication'
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials.')
     
     token = create_access_token(user.email, user.id, timedelta(minutes=20))
 
