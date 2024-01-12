@@ -1,6 +1,6 @@
 import os
-from fastapi import APIRouter, Depends
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from pydantic import BaseModel
 from datetime import datetime, timedelta
 from enum import Enum
@@ -8,7 +8,7 @@ from passlib.context import CryptContext
 from typing import Annotated
 from starlette import status
 from sqlalchemy.orm import Session
-from jose import jwt
+from jose import jwt, JWTError
 from dotenv import load_dotenv
 
 from database.models import User
@@ -23,6 +23,7 @@ router = APIRouter(
 )
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='login')
 
 def get_db():
     db = SessionLocal()
@@ -75,6 +76,19 @@ def create_access_token(email: str, user_id: int, expires_delta: timedelta):
     encode.update({'exp': expires})
 
     return jwt.encode(encode, os.getenv("SECRET_KEY"), algorithm = os.getenv('ALGORITHM'))
+
+async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
+    try:
+        payload = jwt.decode(token, os.getenv('SECRET_KEY'), algorithms=[os.getenv('ALGORITHM')])
+        email: str = payload.get('sub')
+        user_id: int = payload.get('id')
+
+        if email is None or user_id is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials.')
+        
+        return {'email': email, 'id': user_id}
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials.')
 
 ## Routes
 @router.post('/register', status_code = status.HTTP_201_CREATED)
