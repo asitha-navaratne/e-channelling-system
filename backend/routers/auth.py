@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from jose import jwt, JWTError
 from dotenv import load_dotenv
 
-from database.models import User
+from database.models import User, Doctor
 from database.config import SessionLocal
 
 
@@ -54,21 +54,33 @@ class CreateUserRequest(BaseModel):
     nic: str
     password: str
 
+class CreateDoctorRequest(BaseModel):
+    email: str
+    first_name: str
+    last_name: str
+    field: str
+    phone_number: str
+    address: str
+    nic: str
+    password: str
+
 class Token(BaseModel):
     access_token: str
     token_type: str
 
 ## Helpers
-def authenticate_user(email: str, password: str, db: db_dependency):
+def authenticate(email: str, password: str, db: db_dependency):
     user = db.query(User).filter(User.email == email).first()
 
-    if not user:
-        return False
+    if user and bcrypt_context.verify(password, user.hashed_password):
+        return {'email': user.email, 'id': user.id, 'user_role': user.user_role}
+        
+    doctor = db.query(Doctor).filter(Doctor.email == email).first()
+        
+    if doctor and bcrypt_context.verify(password, doctor.hashed_password):
+        return {'email': doctor.email, 'id': doctor.id, 'user_role': 'doctor'}
     
-    if not bcrypt_context.verify(password, user.hashed_password):
-        return False
-    
-    return user
+    return False
 
 def create_access_token(email: str, user_id: int, user_role: str, expires_delta: timedelta):
     encode = {'sub': email, 'id': user_id, 'role': user_role}
@@ -92,7 +104,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials.')
 
 ## Routes
-@router.post('/register', status_code = status.HTTP_201_CREATED)
+@router.post('/user/register', status_code = status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
     create_user_model = User(
         email = create_user_request.email,
@@ -111,13 +123,31 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
     db.add(create_user_model)
     db.commit()
 
+@router.post('/doctor/register', status_code=status.HTTP_201_CREATED)
+async def create_doctor(db: db_dependency, create_doctor_request: CreateDoctorRequest):
+    create_doctor_model = Doctor(
+        email = create_doctor_request.email,
+        first_name = create_doctor_request.first_name,
+        last_name = create_doctor_request.last_name,
+        field = create_doctor_request.field,
+        phone_number = create_doctor_request.phone_number,
+        address = create_doctor_request.address,
+        nic = create_doctor_request.nic,
+        hashed_password = bcrypt_context.hash(create_doctor_request.password),
+        created_dttm = datetime.utcnow(),
+        updated_dttm = datetime.utcnow()
+    )
+    
+    db.add(create_doctor_model)
+    db.commit()
+
 @router.post('/login', response_model=Token)
 async def get_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency):
-    user = authenticate_user(form_data.username, form_data.password, db)
+    details = authenticate(form_data.username, form_data.password, db)
 
-    if not user:
+    if not details:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials.')
     
-    token = create_access_token(user.email, user.id, user.user_role, timedelta(minutes=20))
+    token = create_access_token(details['email'], details['id'], details['user_role'], timedelta(minutes=20))
 
     return {'access_token': token, 'token_type': 'bearer'}
