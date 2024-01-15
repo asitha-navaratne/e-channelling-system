@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from typing import Annotated
 from starlette import status
 from sqlalchemy.orm import Session
@@ -19,13 +19,13 @@ db_dependency = Annotated[Session, Depends(get_db)]
 token_dependency = Annotated[dict, Depends(get_current_user)]
 
 router = APIRouter(
-    prefix='/appointments',
-    tags=['appointments']
+    prefix='/availability',
+    tags=['availability']
 )
 
 @router.get('/')
-async def get_all_appointments(token: token_dependency, db: db_dependency):
+async def get_all_availability(token: token_dependency, db: db_dependency):
     if token is None:
         raise credential_exception
     
-    return {'appointments': []}
+    return {'availability': []}
