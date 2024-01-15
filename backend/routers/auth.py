@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 
 from database.models import User, Doctor
 from database.config import SessionLocal
+from errors.auth_exceptions import credential_exception, authentication_exception
 
 
 load_dotenv()
@@ -22,8 +23,10 @@ router = APIRouter(
     tags=['auth']
 )
 
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/login')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='auth/token')
 
 def get_db():
     db = SessionLocal()
@@ -89,7 +92,7 @@ def create_access_token(email: str, user_id: int, user_role: str, expires_delta:
 
     return jwt.encode(encode, os.getenv("SECRET_KEY"), algorithm = os.getenv('ALGORITHM'))
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     try:
         payload = jwt.decode(token, os.getenv('SECRET_KEY'), algorithms=[os.getenv('ALGORITHM')])
         email: str = payload.get('sub')
@@ -97,11 +100,11 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
         user_role: str = payload.get('role')
 
         if email is None or user_id is None:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials.')
+            raise credential_exception
         
         return {'email': email, 'id': user_id, 'role': user_role}
     except JWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials.')
+        raise credential_exception
 
 ## Routes
 @router.post('/user/register', status_code = status.HTTP_201_CREATED)
@@ -141,13 +144,13 @@ async def create_doctor(db: db_dependency, create_doctor_request: CreateDoctorRe
     db.add(create_doctor_model)
     db.commit()
 
-@router.post('/login', response_model=Token)
+@router.post('/token', response_model=Token)
 async def get_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency):
     details = authenticate(form_data.username, form_data.password, db)
 
     if not details:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials.')
+        raise authentication_exception
     
-    token = create_access_token(details['email'], details['id'], details['user_role'], timedelta(minutes=20))
+    token = create_access_token(details['email'], details['id'], details['user_role'], timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
 
-    return {'access_token': token, 'token_type': 'bearer'}
+    return Token(access_token=token, token_type='bearer')
