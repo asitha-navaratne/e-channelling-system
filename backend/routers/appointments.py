@@ -15,7 +15,7 @@ def get_db():
         db.close()
 
 db_dependency = Annotated[Session, Depends(get_db)]
-user_dependency = Annotated[dict, Depends(get_current_user)]
+token_dependency = Annotated[dict, Depends(get_current_user)]
 
 router = APIRouter(
     prefix='/appointments',
@@ -23,8 +23,8 @@ router = APIRouter(
 )
 
 @router.get('/')
-async def get_all_appointments(user: user_dependency, db: db_dependency):
-    if user is None:
+async def get_all_appointments(token: token_dependency, db: db_dependency):
+    if token is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Authentication Failed')
     
     return {'appointments': []}
