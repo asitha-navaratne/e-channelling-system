@@ -13,3 +13,9 @@ authentication_exception = HTTPException(
     detail='Incorrect username or password.',
     headers={"WWW-Authenticate": "Bearer"},
 )
+
+authorization_exception = HTTPException(
+    status_code=status.HTTP_403_FORBIDDEN, 
+    detail='Unauthorized action.',
+    headers={"WWW-Authenticate": "Bearer"},
+)
