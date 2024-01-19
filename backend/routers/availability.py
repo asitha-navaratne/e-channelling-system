@@ -50,7 +50,7 @@ async def add_availability(token: token_dependency, db: db_dependency, create_av
         doctor_id = token['id'],
         start_time = create_availability_request.start_time,
         end_time = create_availability_request.end_time,
-        created_dttm = datetime.utcnow(),
+        created_dttm = datetime.now(),
     )
 
     db.add(create_availability_model)
