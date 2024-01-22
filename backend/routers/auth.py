@@ -47,9 +47,8 @@ class Titles(Enum):
     dr = 'Dr.'
     rev = 'Rev'
 
-class CreateUserRequest(BaseModel):
+class CreateRequestBase(BaseModel):
     email: str
-    title: Titles
     first_name: str
     last_name: str
     phone_number: str
@@ -57,15 +56,11 @@ class CreateUserRequest(BaseModel):
     nic: str
     password: str
 
-class CreateDoctorRequest(BaseModel):
-    email: str
-    first_name: str
-    last_name: str
+class CreateUserRequest(CreateRequestBase):
+    title: Titles
+
+class CreateDoctorRequest(CreateRequestBase):
     field: str
-    phone_number: str
-    address: str
-    nic: str
-    password: str
 
 class Token(BaseModel):
     access_token: str
