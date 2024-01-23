@@ -3,12 +3,15 @@ from datetime import datetime
 from typing import Annotated
 from pydantic import BaseModel
 from starlette import status
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
 
 from .auth import get_current_user
 from database.models import Availability
 from database.config import SessionLocal
+
 from errors.auth_exceptions import authorization_exception
+from errors.data_exceptions import invalid_time_range_exception, time_slot_conflict_exception
 
 
 def get_db():
@@ -45,6 +48,14 @@ async def get_all_availability(token: token_dependency, db: db_dependency):
 async def add_availability(token: token_dependency, db: db_dependency, create_availability_request: CreateAvailabilityRequest):
     if token['role'] != 'doctor':
         raise authorization_exception
+    
+    if create_availability_request.start_time > create_availability_request.end_time:
+        raise invalid_time_range_exception
+    
+    time_slot_conflicts = db.query(Availability).filter(or_(and_(Availability.start_time <= create_availability_request.start_time, Availability.end_time > create_availability_request.start_time), and_(Availability.start_time < create_availability_request.end_time, Availability.end_time >= create_availability_request.end_time))).filter(Availability.doctor_id == token['id']).all()
+    
+    if time_slot_conflicts:
+        raise time_slot_conflict_exception
 
     create_availability_model = Availability(
         doctor_id = token['id'],

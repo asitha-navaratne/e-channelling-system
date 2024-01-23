@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 
 from database.models import User, Doctor
 from database.config import SessionLocal
+
 from errors.auth_exceptions import credential_exception, authentication_exception
 
 
