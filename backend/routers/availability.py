@@ -66,3 +66,11 @@ async def add_availability(token: token_dependency, db: db_dependency, create_av
 
     db.add(create_availability_model)
     db.commit()
+
+@router.delete('/{availability_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_availability(token: token_dependency, db: db_dependency, availability_id: int):
+    if token['role'] != 'doctor':
+        raise authorization_exception
+    
+    db.query(Availability).filter(Availability.doctor_id == token['id']).filter(Availability.id == availability_id).delete()
+    db.commit()
