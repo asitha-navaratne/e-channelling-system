@@ -21,7 +21,7 @@ load_dotenv()
 
 router = APIRouter(
     prefix='/auth',
-    tags=['auth']
+    tags=['Auth']
 )
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30

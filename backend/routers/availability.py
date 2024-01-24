@@ -26,7 +26,7 @@ token_dependency = Annotated[dict, Depends(get_current_user)]
 
 router = APIRouter(
     prefix='/availability',
-    tags=['availability']
+    tags=['Availability']
 )
 
 ## Types

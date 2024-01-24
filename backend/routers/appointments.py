@@ -19,7 +19,7 @@ token_dependency = Annotated[dict, Depends(get_current_user)]
 
 router = APIRouter(
     prefix='/appointments',
-    tags=['appointments']
+    tags=['Appointments']
 )
 
 @router.get('/')
