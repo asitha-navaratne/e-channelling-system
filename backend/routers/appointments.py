@@ -73,3 +73,11 @@ async def add_appointment(token: token_dependency, db: db_dependency, create_app
         'number': len(existing_appointments) + 1,
         'time': create_appointment_request.appointment_dttm
     }
+
+@router.delete('/{appointment_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def remove_appointment(token: token_dependency, db: db_dependency, appointment_id: int):
+    if token['role'] != 'user':
+        raise authorization_exception
+    
+    db.query(Appointment).filter(Appointment.id == appointment_id, Appointment.user_id == token['id']).delete()
+    db.commit()
