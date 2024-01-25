@@ -36,11 +36,17 @@ class CreateAvailabilityRequest(BaseModel):
 
 ## Routes
 @router.get('/')
-async def get_all_availability(token: token_dependency, db: db_dependency):
+async def get_availability_for_doctor(token: token_dependency, db: db_dependency):
     if token['role'] != 'doctor':
         raise authorization_exception
     
     availability = db.query(Availability).filter(Availability.doctor_id == token['id']).all()
+
+    return {'availability': availability}
+
+@router.get('/{doctor_id}')
+async def get_availability_by_doctor_id(token: token_dependency, db: db_dependency, doctor_id: int):
+    availability = db.query(Availability).filter(Availability.doctor_id == doctor_id).all()
 
     return {'availability': availability}
 
