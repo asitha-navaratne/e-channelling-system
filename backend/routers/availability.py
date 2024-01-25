@@ -58,6 +58,9 @@ async def add_availability(token: token_dependency, db: db_dependency, create_av
     if create_availability_request.start_time > create_availability_request.end_time:
         raise invalid_time_range_exception
     
+    # Check if an availability slot already exists in the time range provided by the user. Checks if
+    #   - Provided start time >= time slot's start time AND provided start time < time slot's end time OR
+    #   - Provided end time > time slot's start time AND provided end time >= time slot's end time
     time_slot_conflicts = db.query(Availability).filter(or_(and_(Availability.start_time <= create_availability_request.start_time, Availability.end_time > create_availability_request.start_time), and_(Availability.start_time < create_availability_request.end_time, Availability.end_time >= create_availability_request.end_time))).filter(Availability.doctor_id == token['id']).all()
     
     if time_slot_conflicts:
@@ -78,5 +81,5 @@ async def delete_availability(token: token_dependency, db: db_dependency, availa
     if token['role'] != 'doctor':
         raise authorization_exception
     
-    db.query(Availability).filter(Availability.doctor_id == token['id']).filter(Availability.id == availability_id).delete()
+    db.query(Availability).filter(Availability.id == availability_id, Availability.doctor_id == token['id']).delete()
     db.commit()
