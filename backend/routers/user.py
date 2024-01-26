@@ -11,7 +11,7 @@ from .auth import get_current_user
 from database.models import User
 from database.config import SessionLocal
 
-from errors.auth_exceptions import authorization_exception
+from errors.auth_exceptions import authentication_exception, authorization_exception, password_mismatch_exception
 
 
 router = APIRouter(
@@ -55,6 +55,9 @@ class EditUserRequest(BaseModel):
     phone_number: str
     email: str
     address: str
+    password: str
+    new_password: str
+    confirm_password: str
 
 ## Routes
 @router.get('/')
@@ -99,9 +102,16 @@ async def edit_user(db: db_dependency, token: token_dependency, edit_user_reques
 
     user_model = db.query(User).filter(User.id == token['id']).first()
 
+    if not bcrypt_context.verify(edit_user_request.password, user_model.hashed_password):
+        raise authentication_exception
+    
+    if edit_user_request.new_password != edit_user_request.confirm_password:
+        raise password_mismatch_exception
+
     user_model.email = edit_user_request.email
     user_model.phone_number = edit_user_request.phone_number
     user_model.address = edit_user_request.address
+    user_model.hashed_password = bcrypt_context.hash(edit_user_request.new_password)
     user_model.updated_dttm = datetime.utcnow()
 
     db.add(user_model)

@@ -10,7 +10,7 @@ from .auth import get_current_user
 from database.models import Doctor
 from database.config import SessionLocal
 
-from errors.auth_exceptions import authorization_exception
+from errors.auth_exceptions import authentication_exception, authorization_exception, password_mismatch_exception
 
 
 router = APIRouter(
@@ -44,6 +44,9 @@ class CreateDoctorRequest(BaseModel):
 class EditDoctorRequest(BaseModel):
     phone_number: str
     email: str
+    password: str
+    new_password: str
+    confirm_password: str
 
 ## Routes
 @router.get('/')
@@ -87,8 +90,15 @@ async def edit_doctor(db: db_dependency, token: Annotated[dict, Depends(get_curr
 
     doctor_model = db.query(Doctor).filter(Doctor.id == token['id']).first()
 
+    if not bcrypt_context.verify(edit_doctor_request.password, doctor_model.hashed_password):
+        raise authentication_exception
+
+    if edit_doctor_request.new_password != edit_doctor_request.confirm_password:
+        raise password_mismatch_exception
+    
     doctor_model.email = edit_doctor_request.email
     doctor_model.phone_number = edit_doctor_request.phone_number
+    doctor_model.hashed_password = bcrypt_context.hash(edit_doctor_request.new_password)
     doctor_model.updated_dttm = datetime.utcnow()
 
     db.add(doctor_model)

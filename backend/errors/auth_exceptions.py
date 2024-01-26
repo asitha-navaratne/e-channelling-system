@@ -19,3 +19,9 @@ authorization_exception = HTTPException(
     detail='User is not authorized to perform this action.',
     headers={"WWW-Authenticate": "Bearer"},
 )
+
+password_mismatch_exception = HTTPException(
+    status_code=status.HTTP_400_BAD_REQUEST, 
+    detail='New passwords do not match. Please make sure the new password and confirmation match.',
+    headers={"WWW-Authenticate": "Bearer"},
+)
