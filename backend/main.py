@@ -15,7 +15,3 @@ app.include_router(user.router)
 app.include_router(doctor.router)
 app.include_router(appointments.router)
 app.include_router(availability.router)
-
-@app.get('/')
-def root():
-    return {'status': 'OK'}
