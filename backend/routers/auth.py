@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 from database.models import User, Doctor
 from database.config import SessionLocal
 
-from errors.auth_exceptions import credential_exception, authentication_exception
+from errors.auth_exceptions import credential_exception, authentication_exception, authorization_exception
 
 
 load_dotenv()
@@ -63,6 +63,13 @@ class CreateUserRequest(CreateRequestBase):
 class CreateDoctorRequest(CreateRequestBase):
     field: str
 
+class EditRequestBase(BaseModel):
+    phone_number: str
+    email: str
+
+class EditUserRequest(EditRequestBase):
+    address: str
+
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -103,7 +110,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         raise credential_exception
 
 ## Routes
-@router.post('/user/register', status_code = status.HTTP_201_CREATED)
+@router.post('/user', status_code = status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
     create_user_model = User(
         email = create_user_request.email,
@@ -122,7 +129,21 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
     db.add(create_user_model)
     db.commit()
 
-@router.post('/doctor/register', status_code=status.HTTP_201_CREATED)
+@router.put('/user', status_code=status.HTTP_200_OK)
+async def edit_user(db: db_dependency, token: Annotated[dict, Depends(get_current_user)], edit_user_request: EditUserRequest):
+    if token['role'] != 'user':
+        raise authorization_exception
+
+    user_model = db.query(User).filter(User.id == token['id']).first()
+
+    user_model.email = edit_user_request.email
+    user_model.phone_number = edit_user_request.phone_number
+    user_model.address = edit_user_request.address
+
+    db.add(user_model)
+    db.commit()
+
+@router.post('/doctor', status_code=status.HTTP_201_CREATED)
 async def create_doctor(db: db_dependency, create_doctor_request: CreateDoctorRequest):
     create_doctor_model = Doctor(
         email = create_doctor_request.email,
@@ -138,6 +159,19 @@ async def create_doctor(db: db_dependency, create_doctor_request: CreateDoctorRe
     )
     
     db.add(create_doctor_model)
+    db.commit()
+
+@router.put('/doctor', status_code=status.HTTP_200_OK)
+async def edit_doctor(db: db_dependency, token: Annotated[dict, Depends(get_current_user)], edit_doctor_request: EditRequestBase):
+    if token['role'] != 'doctor':
+        raise authorization_exception
+
+    doctor_model = db.query(Doctor).filter(Doctor.id == token['id']).first()
+
+    doctor_model.email = edit_doctor_request.email
+    doctor_model.phone_number = edit_doctor_request.phone_number
+
+    db.add(doctor_model)
     db.commit()
 
 @router.post('/token', response_model=Token)
