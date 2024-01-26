@@ -16,6 +16,6 @@ authentication_exception = HTTPException(
 
 authorization_exception = HTTPException(
     status_code=status.HTTP_403_FORBIDDEN, 
-    detail='Unauthorized action.',
+    detail='User is not authorized to perform this action.',
     headers={"WWW-Authenticate": "Bearer"},
 )

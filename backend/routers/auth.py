@@ -110,6 +110,22 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         raise credential_exception
 
 ## Routes
+@router.get('/user')
+async def get_user_details(db: db_dependency, token: Annotated[dict, Depends(get_current_user)]):
+    if token['role'] == 'doctor':
+        raise authorization_exception
+
+    user = db.query(User).filter(User.id == token['id']).first()
+
+    return {
+        'title': user.title,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'address': user.address,
+        'nic': user.nic,
+        'phone_number': user.phone_number    
+    }
+
 @router.post('/user', status_code = status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
     create_user_model = User(
@@ -139,9 +155,26 @@ async def edit_user(db: db_dependency, token: Annotated[dict, Depends(get_curren
     user_model.email = edit_user_request.email
     user_model.phone_number = edit_user_request.phone_number
     user_model.address = edit_user_request.address
+    user_model.updated_dttm = datetime.utcnow()
 
     db.add(user_model)
     db.commit()
+
+@router.get('/doctor')
+async def get_doctor_details(db: db_dependency, token: Annotated[dict, Depends(get_current_user)]):
+    if token['role'] == 'user':
+        raise authorization_exception
+
+    doctor = db.query(Doctor).filter(Doctor.id == token['id']).first()
+
+    return {
+        'first_name': doctor.first_name,
+        'last_name': doctor.last_name,
+        'field': doctor.field,
+        'address': doctor.address,
+        'nic': doctor.nic,
+        'phone_number': doctor.phone_number    
+    }
 
 @router.post('/doctor', status_code=status.HTTP_201_CREATED)
 async def create_doctor(db: db_dependency, create_doctor_request: CreateDoctorRequest):
@@ -170,6 +203,7 @@ async def edit_doctor(db: db_dependency, token: Annotated[dict, Depends(get_curr
 
     doctor_model.email = edit_doctor_request.email
     doctor_model.phone_number = edit_doctor_request.phone_number
+    doctor_model.updated_dttm = datetime.utcnow()
 
     db.add(doctor_model)
     db.commit()
