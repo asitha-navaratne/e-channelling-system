@@ -33,7 +33,7 @@ CREATE TABLE doctors (
 	PRIMARY KEY (id)
 );
 
-DROP TABLE IF EXISTS appointments;
+DROP TABLE IF EXISTS appointments CASCADE;
 
 CREATE TABLE appointments (
 	id SERIAL,
@@ -57,3 +57,19 @@ CREATE TABLE availability (
 	PRIMARY KEY (id),
 	FOREIGN KEY (doctor_id) REFERENCES doctors(id)
 );
+
+DROP TABLE IF EXISTS notifications;
+
+CREATE TABLE notifications (
+	id SERIAL,
+	user_id INTEGER,
+	doctor_id INTEGER,
+	appointment_id INTEGER,
+	message VARCHAR(100),
+	is_read BOOLEAN,
+	created_dttm TIMESTAMP,
+	PRIMARY KEY (id),
+	FOREIGN KEY (user_id) REFERENCES users(id),
+	FOREIGN KEY (doctor_id) REFERENCES doctors(id),
+	FOREIGN KEY (appointment_id) REFERENCES appointments(id)
+)
