@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean
 
 from database.config import Base
 
@@ -50,4 +50,5 @@ class Appointment(Base):
     user_id = Column(Integer, ForeignKey('users.id'), index=True)
     doctor_id = Column(Integer, ForeignKey('doctors.id'), index=True)
     appointment_dttm = Column(DateTime)
+    is_active = Column(Boolean)
     created_dttm = Column(DateTime)

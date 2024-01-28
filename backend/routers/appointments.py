@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Annotated
 from pydantic import BaseModel
 from starlette import status
-from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from .auth import get_current_user
@@ -11,7 +10,7 @@ from database.models import Appointment, Availability
 from database.config import SessionLocal
 
 from errors.auth_exceptions import authorization_exception
-from errors.data_exceptions import time_not_available_exception, appointments_exceeded_exception
+from errors.data_exceptions import time_not_available_exception, appointments_exceeded_exception, cancelation_window_exception
 
 
 def get_db():
@@ -38,9 +37,9 @@ class CreateAppointmentRequest(BaseModel):
 @router.get('/')
 async def get_all_appointments(token: token_dependency, db: db_dependency):
     if token['role'] == 'doctor':
-        appointments = db.query(Appointment).filter(Appointment.doctor_id == token['id']).all()
+        appointments = db.query(Appointment).filter(Appointment.doctor_id == token['id'], Appointment.is_active == True).all()
     else:
-        appointments = db.query(Appointment).filter(Appointment.user_id == token['id']).all()
+        appointments = db.query(Appointment).filter(Appointment.user_id == token['id'], Appointment.is_active == True).all()
 
     return {'appointments': appointments}
 
@@ -63,6 +62,7 @@ async def add_appointment(token: token_dependency, db: db_dependency, create_app
         user_id = token['id'],
         doctor_id = create_appointment_request.doctor_id,
         appointment_dttm = create_appointment_request.appointment_dttm,
+        is_active = True,
         created_dttm = datetime.now(),
     )
 
@@ -74,10 +74,14 @@ async def add_appointment(token: token_dependency, db: db_dependency, create_app
         'time': create_appointment_request.appointment_dttm
     }
 
-@router.delete('/{appointment_id}', status_code=status.HTTP_204_NO_CONTENT)
-async def remove_appointment(token: token_dependency, db: db_dependency, appointment_id: int):
-    if token['role'] != 'user':
-        raise authorization_exception
-    
-    db.query(Appointment).filter(Appointment.id == appointment_id, Appointment.user_id == token['id']).delete()
+@router.put('/{appointment_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def deactivate_appointment(token: token_dependency, db: db_dependency, appointment_id: int):
+    appointment_model = db.query(Appointment).filter(Appointment.id == appointment_id).first()
+
+    if token['role'] != 'user' and appointment_model.appointment_dttm - datetime.now() < timedelta(hours=48):    
+        raise cancelation_window_exception
+
+    appointment_model.is_active = False
+        
+    db.add(appointment_model)
     db.commit()
