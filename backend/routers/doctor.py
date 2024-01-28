@@ -41,9 +41,11 @@ class CreateDoctorRequest(BaseModel):
     nic: str
     password: str
 
-class EditDoctorRequest(BaseModel):
+class ChangeDoctorRequest(BaseModel):
     phone_number: str
     email: str
+
+class ChangePasswordRequest(BaseModel):
     password: str
     new_password: str
     confirm_password: str
@@ -84,21 +86,33 @@ async def create_doctor(db: db_dependency, create_doctor_request: CreateDoctorRe
     db.commit()
 
 @router.put('/', status_code=status.HTTP_200_OK)
-async def edit_doctor(db: db_dependency, token: Annotated[dict, Depends(get_current_user)], edit_doctor_request: EditDoctorRequest):
+async def edit_doctor(db: db_dependency, token: Annotated[dict, Depends(get_current_user)], change_doctor_request: ChangeDoctorRequest):
+    if token['role'] != 'doctor':
+        raise authorization_exception
+
+    doctor_model = db.query(Doctor).filter(Doctor.id == token['id']).first()
+    
+    doctor_model.email = change_doctor_request.email
+    doctor_model.phone_number = change_doctor_request.phone_number
+    doctor_model.updated_dttm = datetime.utcnow()
+
+    db.add(doctor_model)
+    db.commit()
+
+@router.put('/change-password', status_code=status.HTTP_200_OK)
+async def change_password(db: db_dependency, token: Annotated[dict, Depends(get_current_user)], change_password_request: ChangePasswordRequest):
     if token['role'] != 'doctor':
         raise authorization_exception
 
     doctor_model = db.query(Doctor).filter(Doctor.id == token['id']).first()
 
-    if not bcrypt_context.verify(edit_doctor_request.password, doctor_model.hashed_password):
+    if not bcrypt_context.verify(change_password_request.password, doctor_model.hashed_password):
         raise authentication_exception
 
-    if edit_doctor_request.new_password != edit_doctor_request.confirm_password:
+    if change_password_request.new_password != change_password_request.confirm_password:
         raise password_mismatch_exception
     
-    doctor_model.email = edit_doctor_request.email
-    doctor_model.phone_number = edit_doctor_request.phone_number
-    doctor_model.hashed_password = bcrypt_context.hash(edit_doctor_request.new_password)
+    doctor_model.hashed_password = bcrypt_context.hash(change_password_request.new_password)
     doctor_model.updated_dttm = datetime.utcnow()
 
     db.add(doctor_model)

@@ -51,10 +51,12 @@ class CreateUserRequest(BaseModel):
     nic: str
     password: str
 
-class EditUserRequest(BaseModel):
+class ChangeUserRequest(BaseModel):
     phone_number: str
     email: str
     address: str
+
+class ChangePasswordRequest(BaseModel):
     password: str
     new_password: str
     confirm_password: str
@@ -96,23 +98,35 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
     db.commit()
 
 @router.put('/', status_code=status.HTTP_200_OK)
-async def edit_user(db: db_dependency, token: token_dependency, edit_user_request: EditUserRequest):
+async def edit_user(db: db_dependency, token: token_dependency, change_user_request: ChangeUserRequest):
     if token['role'] != 'user':
         raise authorization_exception
 
     user_model = db.query(User).filter(User.id == token['id']).first()
 
-    if not bcrypt_context.verify(edit_user_request.password, user_model.hashed_password):
-        raise authentication_exception
-    
-    if edit_user_request.new_password != edit_user_request.confirm_password:
-        raise password_mismatch_exception
-
-    user_model.email = edit_user_request.email
-    user_model.phone_number = edit_user_request.phone_number
-    user_model.address = edit_user_request.address
-    user_model.hashed_password = bcrypt_context.hash(edit_user_request.new_password)
+    user_model.email = change_user_request.email
+    user_model.phone_number = change_user_request.phone_number
+    user_model.address = change_user_request.address
     user_model.updated_dttm = datetime.utcnow()
 
+    db.add(user_model)
+    db.commit()
+
+@router.put('/change-password', status_code=status.HTTP_200_OK)
+async def change_password(db: db_dependency, token: token_dependency, change_password_request: ChangePasswordRequest):
+    if token['role'] != 'user':
+        raise authorization_exception
+    
+    user_model = db.query(User).filter(User.id == token['id']).first()
+
+    if not bcrypt_context.verify(change_password_request.password, user_model.hashed_password):
+        raise authentication_exception
+    
+    if change_password_request.new_password != change_password_request.confirm_password:
+        raise password_mismatch_exception
+    
+    user_model.hashed_password = bcrypt_context.hash(change_password_request.new_password)
+    user_model.updated_dttm = datetime.utcnow()
+    
     db.add(user_model)
     db.commit()
