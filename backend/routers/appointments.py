@@ -36,7 +36,9 @@ class CreateAppointmentRequest(BaseModel):
 # Routes
 @router.get('/')
 async def get_all_appointments(token: token_dependency, db: db_dependency):
-    if token['role'] == 'doctor':
+    if token['role'] == 'admin':
+        appointments = db.query(Appointment).filter(Appointment.is_active == True).all()
+    elif token['role'] == 'doctor':
         appointments = db.query(Appointment).filter(Appointment.doctor_id == token['id'], Appointment.is_active == True).all()
     else:
         appointments = db.query(Appointment).filter(Appointment.user_id == token['id'], Appointment.is_active == True).all()
