@@ -7,11 +7,11 @@ from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
 
 from .auth import get_current_user
-from database.models import Availability
+from database.models import Availability, Appointment
 from database.config import SessionLocal
 
 from errors.auth_exceptions import authorization_exception
-from errors.data_exceptions import invalid_time_range_exception, time_slot_conflict_exception
+from errors.data_exceptions import invalid_time_range_exception, time_slot_conflict_exception, existing_appointment_conflict_exception
 
 
 def get_db():
@@ -81,5 +81,12 @@ async def delete_availability(token: token_dependency, db: db_dependency, availa
     if token['role'] != 'doctor':
         raise authorization_exception
     
-    db.query(Availability).filter(Availability.id == availability_id, Availability.doctor_id == token['id']).delete()
+    availability_model = db.query(Availability).filter(Availability.id == availability_id, Availability.doctor_id == token['id']).first()
+
+    appointments = db.query(Appointment).filter(Appointment.appointment_dttm >= availability_model.start_time, Appointment.appointment_dttm < availability_model.end_time).all()
+
+    if appointments:
+        raise existing_appointment_conflict_exception
+    
+    availability_model.delete()
     db.commit()
