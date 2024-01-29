@@ -34,6 +34,6 @@ cancelation_window_exception = HTTPException(
 
 existing_appointment_conflict_exception = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,
-    detail='Appointments can only be cancelled before 48 hours from the appointment time.',
+    detail='An appointment exists in the given time slot. Remove the appointment before deleting the time slot.',
     headers={"WWW-Authenticate": "Bearer"},
 )
