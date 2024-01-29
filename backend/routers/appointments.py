@@ -76,7 +76,7 @@ async def add_appointment(token: token_dependency, db: db_dependency, create_app
         'time': create_appointment_request.appointment_dttm
     }
 
-@router.put('/{appointment_id}', status_code=status.HTTP_204_NO_CONTENT)
+@router.patch('/{appointment_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def deactivate_appointment(token: token_dependency, db: db_dependency, appointment_id: int):
     appointment_model = db.query(Appointment).filter(Appointment.id == appointment_id).first()
 

@@ -85,7 +85,7 @@ async def create_doctor(db: db_dependency, create_doctor_request: CreateDoctorRe
     db.add(create_doctor_model)
     db.commit()
 
-@router.put('/', status_code=status.HTTP_200_OK)
+@router.patch('/', status_code=status.HTTP_200_OK)
 async def edit_doctor(db: db_dependency, token: Annotated[dict, Depends(get_current_user)], change_doctor_request: ChangeDoctorRequest):
     if token['role'] != 'doctor':
         raise authorization_exception
@@ -99,7 +99,7 @@ async def edit_doctor(db: db_dependency, token: Annotated[dict, Depends(get_curr
     db.add(doctor_model)
     db.commit()
 
-@router.put('/change-password', status_code=status.HTTP_200_OK)
+@router.patch('/change-password', status_code=status.HTTP_200_OK)
 async def change_password(db: db_dependency, token: Annotated[dict, Depends(get_current_user)], change_password_request: ChangePasswordRequest):
     if token['role'] != 'doctor':
         raise authorization_exception

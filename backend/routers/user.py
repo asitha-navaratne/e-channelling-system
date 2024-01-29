@@ -97,7 +97,7 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
     db.add(create_user_model)
     db.commit()
 
-@router.put('/', status_code=status.HTTP_200_OK)
+@router.patch('/', status_code=status.HTTP_200_OK)
 async def edit_user(db: db_dependency, token: token_dependency, change_user_request: ChangeUserRequest):
     if token['role'] != 'user':
         raise authorization_exception
@@ -112,7 +112,7 @@ async def edit_user(db: db_dependency, token: token_dependency, change_user_requ
     db.add(user_model)
     db.commit()
 
-@router.put('/change-password', status_code=status.HTTP_200_OK)
+@router.patch('/change-password', status_code=status.HTTP_200_OK)
 async def change_password(db: db_dependency, token: token_dependency, change_password_request: ChangePasswordRequest):
     if token['role'] != 'user':
         raise authorization_exception
