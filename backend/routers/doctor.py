@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, timezone
 from passlib.context import CryptContext
 from typing import Annotated
 from starlette import status
@@ -78,8 +78,8 @@ async def create_doctor(db: db_dependency, create_doctor_request: CreateDoctorRe
         address = create_doctor_request.address,
         nic = create_doctor_request.nic,
         hashed_password = bcrypt_context.hash(create_doctor_request.password),
-        created_dttm = datetime.utcnow(),
-        updated_dttm = datetime.utcnow()
+        created_dttm = datetime.now(tz=timezone.utc),
+        updated_dttm = datetime.now(tz=timezone.utc)
     )
     
     db.add(create_doctor_model)
@@ -94,7 +94,7 @@ async def edit_doctor(db: db_dependency, token: Annotated[dict, Depends(get_curr
     
     doctor_model.email = change_doctor_request.email
     doctor_model.phone_number = change_doctor_request.phone_number
-    doctor_model.updated_dttm = datetime.utcnow()
+    doctor_model.updated_dttm = datetime.now(tz=timezone.utc)
 
     db.add(doctor_model)
     db.commit()
@@ -113,7 +113,7 @@ async def change_password(db: db_dependency, token: Annotated[dict, Depends(get_
         raise password_mismatch_exception
     
     doctor_model.hashed_password = bcrypt_context.hash(change_password_request.new_password)
-    doctor_model.updated_dttm = datetime.utcnow()
+    doctor_model.updated_dttm = datetime.now(tz=timezone.utc)
 
     db.add(doctor_model)
     db.commit()

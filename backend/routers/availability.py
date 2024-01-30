@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Annotated
 from pydantic import BaseModel
 from starlette import status
@@ -11,7 +11,7 @@ from database.models import Availability, Appointment
 from database.config import SessionLocal
 
 from errors.auth_exceptions import authorization_exception
-from errors.data_exceptions import invalid_time_range_exception, time_slot_conflict_exception, existing_appointment_conflict_exception
+from errors.data_exceptions import invalid_time_range_exception, time_slot_conflict_exception, existing_appointment_conflict_exception, invalid_datetime_exception
 
 
 def get_db():
@@ -55,6 +55,9 @@ async def add_availability(token: token_dependency, db: db_dependency, create_av
     if token['role'] != 'doctor':
         raise authorization_exception
     
+    if create_availability_request.start_time < datetime.now(tz=timezone.utc):
+        raise invalid_datetime_exception
+    
     if create_availability_request.start_time > create_availability_request.end_time:
         raise invalid_time_range_exception
     
@@ -70,7 +73,7 @@ async def add_availability(token: token_dependency, db: db_dependency, create_av
         doctor_id = token['id'],
         start_time = create_availability_request.start_time,
         end_time = create_availability_request.end_time,
-        created_dttm = datetime.now(),
+        created_dttm = datetime.now(tz=timezone.utc),
     )
 
     db.add(create_availability_model)

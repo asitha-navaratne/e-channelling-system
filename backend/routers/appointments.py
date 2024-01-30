@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Annotated
 from pydantic import BaseModel
 from starlette import status
@@ -10,7 +10,7 @@ from database.models import Appointment, Availability
 from database.config import SessionLocal
 
 from errors.auth_exceptions import authorization_exception
-from errors.data_exceptions import time_not_available_exception, appointments_exceeded_exception, cancelation_window_exception
+from errors.data_exceptions import time_not_available_exception, appointments_exceeded_exception, cancelation_window_exception, invalid_datetime_exception
 
 
 def get_db():
@@ -50,6 +50,9 @@ async def add_appointment(token: token_dependency, db: db_dependency, create_app
     if token['role'] != 'user':
         raise authorization_exception
     
+    if create_appointment_request.appointment_dttm < datetime.now(tz=timezone.utc):
+        raise invalid_datetime_exception
+    
     time_available = db.query(Availability).filter(Availability.start_time <= create_appointment_request.appointment_dttm, Availability.end_time > create_appointment_request.appointment_dttm, Availability.doctor_id == create_appointment_request.doctor_id).first()
 
     if not time_available:
@@ -65,7 +68,7 @@ async def add_appointment(token: token_dependency, db: db_dependency, create_app
         doctor_id = create_appointment_request.doctor_id,
         appointment_dttm = create_appointment_request.appointment_dttm,
         is_active = True,
-        created_dttm = datetime.now(),
+        created_dttm = datetime.now(tz=timezone.utc),
     )
 
     db.add(create_appointment_model)
@@ -80,7 +83,7 @@ async def add_appointment(token: token_dependency, db: db_dependency, create_app
 async def deactivate_appointment(token: token_dependency, db: db_dependency, appointment_id: int):
     appointment_model = db.query(Appointment).filter(Appointment.id == appointment_id).first()
 
-    if token['role'] != 'user' and appointment_model.appointment_dttm - datetime.now() < timedelta(hours=48):    
+    if token['role'] != 'user' and appointment_model.appointment_dttm - datetime.now(tz=timezone.utc) < timedelta(hours=48):    
         raise cancelation_window_exception
 
     appointment_model.is_active = False

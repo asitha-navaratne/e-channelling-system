@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from passlib.context import CryptContext
 from typing import Annotated
@@ -90,8 +90,8 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
         nic = create_user_request.nic,
         user_role = 'user',
         hashed_password = bcrypt_context.hash(create_user_request.password),
-        created_dttm = datetime.utcnow(),
-        updated_dttm = datetime.utcnow()
+        created_dttm = datetime.now(tz=timezone.utc),
+        updated_dttm = datetime.now(tz=timezone.utc)
     )
 
     db.add(create_user_model)
@@ -107,7 +107,7 @@ async def edit_user(db: db_dependency, token: token_dependency, change_user_requ
     user_model.email = change_user_request.email
     user_model.phone_number = change_user_request.phone_number
     user_model.address = change_user_request.address
-    user_model.updated_dttm = datetime.utcnow()
+    user_model.updated_dttm = datetime.now(tz=timezone.utc)
 
     db.add(user_model)
     db.commit()
@@ -126,7 +126,7 @@ async def change_password(db: db_dependency, token: token_dependency, change_pas
         raise password_mismatch_exception
     
     user_model.hashed_password = bcrypt_context.hash(change_password_request.new_password)
-    user_model.updated_dttm = datetime.utcnow()
+    user_model.updated_dttm = datetime.now(tz=timezone.utc)
     
     db.add(user_model)
     db.commit()

@@ -37,3 +37,9 @@ existing_appointment_conflict_exception = HTTPException(
     detail='An appointment exists in the given time slot. Remove the appointment before deleting the time slot.',
     headers={"WWW-Authenticate": "Bearer"},
 )
+
+invalid_datetime_exception = HTTPException(
+    status_code=status.HTTP_400_BAD_REQUEST,
+    detail='The provided time slot is before the current date. Please provide a correct time slot',
+    headers={"WWW-Authenticate": "Bearer"},
+)
