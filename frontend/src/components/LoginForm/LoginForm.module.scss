@@ -1,0 +1,37 @@
+.login-form {
+  width: 25vw;
+  overflow-y: auto;
+  font-size: 0.9rem;
+  font-weight: 100;
+
+  &__logo {
+    margin: 2vh auto;
+    height: 15vh;
+  }
+
+  &__header {
+    margin: 0 auto 1.5vh;
+    font-weight: 100;
+  }
+
+  &__intro-text {
+    margin: 1vh 0;
+    text-align: justify;
+  }
+
+  &__help-text {
+    margin: 3vh auto 1vh;
+  }
+}
+
+@media (max-width: 600px) {
+  .login-form {
+    width: 100vw;
+  }
+}
+
+@media (min-width: 600px) and (orientation: portrait) {
+  .login-form {
+    width: 40vw;
+  }
+}
