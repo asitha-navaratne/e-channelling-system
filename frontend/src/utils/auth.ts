@@ -6,7 +6,7 @@ const getAuthToken = function () {
   const token = localStorage.getItem("token");
 
   if (!token) {
-    return redirect(config.pages.login);
+    return redirect(config.routes.login);
   }
 
   return token;

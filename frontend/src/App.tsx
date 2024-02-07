@@ -1,5 +1,7 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
+import config from "./configs/urls.config";
+
 import HomePage from "./views/HomePage/HomePage";
 import LoginPage from "./views/LoginPage/LoginPage";
 
@@ -9,7 +11,7 @@ import { tokenLoader } from "./utils/auth";
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: config.routes.root,
     element: <Root />,
     id: "root",
     loader: tokenLoader,
@@ -21,7 +23,7 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "/login",
+    path: config.routes.login,
     element: <LoginPage />,
     id: "login",
   },
