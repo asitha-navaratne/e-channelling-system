@@ -1,4 +1,5 @@
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button, IconButton, Stack, TextField } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -22,6 +23,8 @@ const LoginForm = () => {
 
   const emailInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
+
+  const navigate = useNavigate();
 
   const toggleShowPassword = function (): void {
     setIsPasswordShown((prev) => !prev);
@@ -66,7 +69,12 @@ const LoginForm = () => {
 
     setIsLoginButtonDisabled(true);
     GetAuthToken(email, password)
-      .then((res) => console.log(res.data))
+      .then((res) => {
+        const token = res.data.access_token;
+        localStorage.setItem("token", token);
+
+        navigate("/");
+      })
       .catch((err) => {
         const [emailError, passwordError, genericError] = handleAuthError(err);
 
