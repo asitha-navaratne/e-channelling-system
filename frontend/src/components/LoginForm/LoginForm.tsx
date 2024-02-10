@@ -118,7 +118,9 @@ const LoginForm = () => {
           error={passwordErrorMessage !== ""}
           helperText={passwordErrorMessage}
         />
-        <p className={styles["login-form__error-message"]}>{errorMessage}</p>
+        <p className={styles["login-form__error-message"]}>
+          &#8203;{errorMessage}
+        </p>
         <Button
           variant="contained"
           type="submit"
