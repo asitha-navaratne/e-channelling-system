@@ -8,6 +8,7 @@ import LoginPage from "./views/LoginPage/LoginPage";
 import Root from "./components/Root/Root";
 
 import { tokenLoader } from "./utils/auth";
+import loginLoader from "./views/LoginPage/LoginPage.loader";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
     path: config.routes.login,
     element: <LoginPage />,
     id: "login",
+    loader: loginLoader,
   },
 ]);
 
