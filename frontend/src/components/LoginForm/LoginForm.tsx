@@ -1,5 +1,5 @@
-import { ChangeEvent, FormEvent, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { ChangeEvent, FC, useEffect, useState } from "react";
+import { Form, useActionData, useNavigation } from "react-router-dom";
 import { Button, IconButton, Stack, TextField } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -7,88 +7,51 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import styles from "./LoginForm.module.scss";
 import logo from "../../assets/logo.png";
 
-import handleAuthError from "../../helpers/handleAuthError";
+import LoginErrorMessageType from "../../types/LoginErrorMessageType";
 
-import { GetAuthToken } from "../../service/AuthServices";
-
-const LoginForm = () => {
+const LoginForm: FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [emailErrorMessage, setEmailErrorMessage] = useState<string>("");
-  const [passwordErrorMessage, setPasswordErrorMessage] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [emailHelperText, setEmailHelperText] = useState<string>();
+  const [passwordHelperText, setPasswordHelperText] = useState<string>();
+  const [errorMessage, setErrorMessage] = useState<string>();
   const [isPasswordShown, setIsPasswordShown] = useState<boolean>(false);
-  const [isLoginButtonDisabled, setIsLoginButtonDisabled] =
-    useState<boolean>(false);
 
-  const emailInputRef = useRef<HTMLInputElement>(null);
-  const passwordInputRef = useRef<HTMLInputElement>(null);
+  const data = useActionData() as LoginErrorMessageType;
+  const navigation = useNavigation();
 
-  const navigate = useNavigate();
+  const isSubmitting = navigation.state === "submitting";
+
+  useEffect(() => {
+    setEmailHelperText(data?.emailHelperText ?? "");
+    setPasswordHelperText(data?.passwordHelperText ?? "");
+    setErrorMessage(data?.errorMessage ?? "");
+  }, [data]);
 
   const toggleShowPassword = function (): void {
     setIsPasswordShown((prev) => !prev);
   };
 
   const handleEmailChange = function (e: ChangeEvent<HTMLInputElement>): void {
-    setEmailErrorMessage("");
+    setEmailHelperText("");
     setEmail(e.target.value);
   };
 
   const validateEmail = function (): void {
     if (email !== "" && !email.includes("@")) {
-      setEmailErrorMessage("Please enter a valid email address!");
+      setEmailHelperText("Please enter a valid email address!");
     }
   };
 
   const handlePasswordChange = function (
     e: ChangeEvent<HTMLInputElement>
   ): void {
-    setPasswordErrorMessage("");
+    setPasswordHelperText("");
     setPassword(e.target.value);
   };
 
-  const handleSubmit = function (e: FormEvent<HTMLFormElement>): void {
-    e.preventDefault();
-
-    setErrorMessage("");
-
-    if (email === "" || !email.includes("@")) {
-      setEmailErrorMessage("Please enter a valid email address!");
-      emailInputRef.current?.focus();
-
-      return;
-    }
-
-    if (password === "") {
-      setPasswordErrorMessage("Please enter your password!");
-      passwordInputRef.current?.focus();
-
-      return;
-    }
-
-    setIsLoginButtonDisabled(true);
-    GetAuthToken(email, password)
-      .then((res) => {
-        const token = res.data.access_token;
-        localStorage.setItem("token", token);
-
-        navigate("/");
-      })
-      .catch((err) => {
-        const [emailError, passwordError, genericError] = handleAuthError(err);
-
-        setEmailErrorMessage(emailError);
-        setPasswordErrorMessage(passwordError);
-        setErrorMessage(genericError);
-      })
-      .finally(() => {
-        setIsLoginButtonDisabled(false);
-      });
-  };
-
   return (
-    <form onSubmit={handleSubmit} className={styles["login-form"]}>
+    <Form method="POST" className={styles["login-form"]}>
       <Stack paddingX={4}>
         <img src={logo} className={styles["login-form__logo"]} />
         <h2 className={styles["login-form__header"]}>Sign In</h2>
@@ -102,19 +65,19 @@ const LoginForm = () => {
         <TextField
           label="Email"
           type="text"
+          name="email"
           sx={{ mt: 2 }}
           value={email}
-          ref={emailInputRef}
           onChange={handleEmailChange}
           onBlur={validateEmail}
-          error={emailErrorMessage !== ""}
-          helperText={emailErrorMessage}
+          error={emailHelperText !== ""}
+          helperText={emailHelperText}
         />
         <TextField
           label="Password"
           type={isPasswordShown ? "text" : "password"}
+          name="password"
           value={password}
-          ref={passwordInputRef}
           onChange={handlePasswordChange}
           InputProps={{
             endAdornment: (
@@ -123,8 +86,8 @@ const LoginForm = () => {
               </IconButton>
             ),
           }}
-          error={passwordErrorMessage !== ""}
-          helperText={passwordErrorMessage}
+          error={passwordHelperText !== ""}
+          helperText={passwordHelperText}
         />
         <p className={styles["login-form__error-message"]}>
           &#8203;{errorMessage}
@@ -133,7 +96,7 @@ const LoginForm = () => {
           variant="contained"
           type="submit"
           sx={{ mt: 1 }}
-          disabled={isLoginButtonDisabled}
+          disabled={isSubmitting}
         >
           Log in
         </Button>
@@ -145,7 +108,7 @@ const LoginForm = () => {
           Forgot Password?
         </Button>
       </Stack>
-    </form>
+    </Form>
   );
 };
 

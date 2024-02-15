@@ -9,6 +9,7 @@ import Root from "./components/Root/Root";
 
 import { tokenLoader } from "./utils/auth";
 import loginLoader from "./views/LoginPage/LoginPage.loader";
+import loginAction from "./views/LoginPage/LoginPage.action";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,7 @@ const router = createBrowserRouter([
     element: <LoginPage />,
     id: "login",
     loader: loginLoader,
+    action: loginAction,
   },
 ]);
 

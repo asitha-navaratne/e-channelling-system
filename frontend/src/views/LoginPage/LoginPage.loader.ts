@@ -2,7 +2,7 @@ import { redirect } from "react-router-dom";
 
 import config from "../../configs/urls.config";
 
-const loader = function () {
+function loader() {
   const token = localStorage.getItem("token");
 
   if (token) {
@@ -10,6 +10,6 @@ const loader = function () {
   }
 
   return null;
-};
+}
 
 export default loader;
