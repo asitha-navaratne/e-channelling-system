@@ -1,11 +1,18 @@
 import { ChangeEvent, FC, useEffect, useState } from "react";
-import { Form, useActionData, useNavigation } from "react-router-dom";
+import {
+  Form,
+  useActionData,
+  useNavigate,
+  useNavigation,
+} from "react-router-dom";
 import { Button, IconButton, Stack, TextField } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 import styles from "./LoginForm.module.scss";
 import logo from "../../assets/logo.png";
+
+import config from "../../configs/urls.config";
 
 import LoginErrorMessageType from "../../types/LoginErrorMessageType";
 
@@ -18,6 +25,7 @@ const LoginForm: FC = () => {
   const [isPasswordShown, setIsPasswordShown] = useState<boolean>(false);
 
   const data = useActionData() as LoginErrorMessageType;
+  const navigate = useNavigate();
   const navigation = useNavigation();
 
   const isSubmitting = navigation.state === "submitting";
@@ -48,6 +56,10 @@ const LoginForm: FC = () => {
   ): void {
     setPasswordHelperText("");
     setPassword(e.target.value);
+  };
+
+  const handleSignUpButtonClick = function (): void {
+    navigate(config.routes.signup);
   };
 
   return (
@@ -103,7 +115,9 @@ const LoginForm: FC = () => {
         <p className={styles["login-form__help-text"]}>
           Don't have an account?
         </p>
-        <Button variant="outlined">Sign Up</Button>
+        <Button variant="outlined" onClick={handleSignUpButtonClick}>
+          Sign Up
+        </Button>
         <Button variant="text" sx={{ mt: 4, mb: 4 }}>
           Forgot Password?
         </Button>

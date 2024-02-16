@@ -4,6 +4,7 @@ import config from "./configs/urls.config";
 
 import HomePage from "./views/HomePage/HomePage";
 import LoginPage from "./views/LoginPage/LoginPage";
+import SignUpPage from "./views/SignUpPage/SignUpPage";
 
 import Root from "./components/Root/Root";
 
@@ -30,6 +31,11 @@ const router = createBrowserRouter([
     id: "login",
     loader: loginLoader,
     action: loginAction,
+  },
+  {
+    path: config.routes.signup,
+    element: <SignUpPage />,
+    id: "signup",
   },
 ]);
 

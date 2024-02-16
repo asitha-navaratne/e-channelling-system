@@ -3,6 +3,7 @@ import { AxiosError, AxiosResponse } from "axios";
 
 import handleAuthError from "../../helpers/handleAuthError";
 
+import config from "../../configs/urls.config";
 import { GetAuthToken } from "../../service/AuthServices";
 
 import ApiCallExceptionType from "../../types/ApiCallExceptionType";
@@ -45,7 +46,7 @@ async function action({ request }: { request: Request }) {
   const token = res.data.access_token;
   localStorage.setItem("token", token);
 
-  return redirect("/");
+  return redirect(config.routes.root);
 }
 
 export default action;

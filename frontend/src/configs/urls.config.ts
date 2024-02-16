@@ -2,6 +2,7 @@ const config = {
   routes: {
     root: "/",
     login: "/login",
+    signup: "/signup",
   },
 
   api: {
