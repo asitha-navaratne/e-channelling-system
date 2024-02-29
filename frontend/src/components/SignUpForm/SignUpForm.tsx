@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Form } from "react-router-dom";
+import { Form, useNavigate } from "react-router-dom";
 import { Button, IconButton, Stack, TextField } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 import styles from "./SignUpForm.module.scss";
 import logo from "../../assets/logo.png";
+
+import config from "../../configs/urls.config";
 
 import SignUpPayloadType from "../../types/SignUpPayloadType";
 
@@ -25,12 +27,18 @@ const SignUpForm = () => {
   const [isConfirmPasswordShown, setIsConfirmPasswordShown] =
     useState<boolean>(false);
 
+  const navigate = useNavigate();
+
   const toggleShowPassword = function (): void {
     setIsPasswordShown((prev) => !prev);
   };
 
   const toggleShowConfirmPassword = function (): void {
     setIsConfirmPasswordShown((prev) => !prev);
+  };
+
+  const handleLogInButtonClick = function (): void {
+    navigate(config.routes.login);
   };
 
   return (
@@ -116,7 +124,11 @@ const SignUpForm = () => {
         <p className={styles["sign-up-form__help-text"]}>
           Already have an account?
         </p>
-        <Button variant="outlined" sx={{ mb: 5 }}>
+        <Button
+          variant="outlined"
+          sx={{ mb: 5 }}
+          onClick={handleLogInButtonClick}
+        >
           Log In
         </Button>
       </Stack>
