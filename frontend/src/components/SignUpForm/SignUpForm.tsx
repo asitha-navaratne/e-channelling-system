@@ -17,6 +17,7 @@ import config from "../../configs/urls.config";
 
 import SignUpPayloadType from "../../types/SignUpPayloadType";
 import SignUpPayloadInitValues from "../../constants/SignUpPayloadInitValues";
+import ValidationErrorMessages from "../../constants/ValidationErrorMessages";
 
 const SignUpForm: FC = () => {
   const [userDetails, setUserDetails] = useState<SignUpPayloadType>(
@@ -43,7 +44,7 @@ const SignUpForm: FC = () => {
     if (userDetails["email"] !== "" && !userDetails["email"].includes("@")) {
       setInputHelperText((prev) => ({
         ...prev,
-        email: "Please enter a valid email address!",
+        email: ValidationErrorMessages.ValidEmailMessage,
       }));
     }
     if (userDetails["phoneNumber"] !== "") {
@@ -61,16 +62,16 @@ const SignUpForm: FC = () => {
 
   const generatePhoneNumberErrorMessage = function (): string {
     if (userDetails["phoneNumber"][0] === "0") {
-      return "Please remove the leading zero!";
+      return ValidationErrorMessages.PhoneNumberLeadingZeroMessage;
     }
     if (userDetails["phoneNumber"][0] === "+") {
-      return "Please remove the area code! (+94 etc.)";
+      return ValidationErrorMessages.PhoneNumberAreaCodeMessage;
     }
     if (userDetails["phoneNumber"].match(/[^0-9]/g)) {
-      return "Please enter a valid phone number!";
+      return ValidationErrorMessages.ValidPhoneNumberMessage;
     }
     if (userDetails["phoneNumber"].length !== 9) {
-      return "Please enter a 9 digit phone number!";
+      return ValidationErrorMessages.PhoneNumberDigitsMessage;
     }
 
     return "";

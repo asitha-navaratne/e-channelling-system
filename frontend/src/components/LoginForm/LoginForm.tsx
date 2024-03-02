@@ -15,6 +15,7 @@ import logo from "../../assets/logo.png";
 import config from "../../configs/urls.config";
 
 import LoginErrorMessageType from "../../types/LoginErrorMessageType";
+import ValidationErrorMessages from "../../constants/ValidationErrorMessages";
 
 const LoginForm: FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -47,7 +48,7 @@ const LoginForm: FC = () => {
 
   const validateEmail = function (): void {
     if (email !== "" && !email.includes("@")) {
-      setEmailHelperText("Please enter a valid email address!");
+      setEmailHelperText(ValidationErrorMessages.ValidEmailMessage);
     }
   };
 

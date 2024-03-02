@@ -8,6 +8,7 @@ import { GetAuthToken } from "../../service/AuthServices";
 
 import ApiCallExceptionType from "../../types/ApiCallExceptionType";
 import GetAuthTokenResponseType from "../../types/GetAuthTokenResponseType";
+import ValidationErrorMessages from "../../constants/ValidationErrorMessages";
 
 async function action({ request }: { request: Request }) {
   const data = await request.formData();
@@ -22,12 +23,13 @@ async function action({ request }: { request: Request }) {
   const password = data.get("password") as string;
 
   if (email === "" || !email.includes("@")) {
-    errorResponse.emailHelperText = "Please enter a valid email address!";
+    errorResponse.emailHelperText = ValidationErrorMessages.ValidEmailMessage;
     return errorResponse;
   }
 
   if (password === "") {
-    errorResponse.passwordHelperText = "Please enter your password!";
+    errorResponse.passwordHelperText =
+      ValidationErrorMessages.EnterPasswordMessage;
     return errorResponse;
   }
 

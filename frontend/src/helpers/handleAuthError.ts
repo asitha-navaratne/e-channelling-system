@@ -2,14 +2,15 @@ import { AxiosError } from "axios";
 
 import ApiCallExceptionType from "../types/ApiCallExceptionType";
 import LoginErrorMessageType from "../types/LoginErrorMessageType";
+import ValidationErrorMessages from "../constants/ValidationErrorMessages";
 
 const handleAuthError = function (
   err: AxiosError<ApiCallExceptionType>
 ): LoginErrorMessageType {
   if (err.response?.data?.detail === "Incorrect username or password.") {
     return {
-      emailHelperText: "Incorrect username or password.",
-      passwordHelperText: "Incorrect username or password.",
+      emailHelperText: ValidationErrorMessages.IncorrectCredentialsMessage,
+      passwordHelperText: ValidationErrorMessages.IncorrectCredentialsMessage,
       errorMessage: "",
     };
   } else if (err.response?.data?.detail) {
