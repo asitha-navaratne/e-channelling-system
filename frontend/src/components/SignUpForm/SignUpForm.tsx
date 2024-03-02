@@ -1,6 +1,12 @@
-import { useState } from "react";
+import { ChangeEvent, FC, useState } from "react";
 import { Form, useNavigate } from "react-router-dom";
-import { Button, IconButton, Stack, TextField } from "@mui/material";
+import {
+  Button,
+  IconButton,
+  InputAdornment,
+  Stack,
+  TextField,
+} from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
@@ -10,19 +16,15 @@ import logo from "../../assets/logo.png";
 import config from "../../configs/urls.config";
 
 import SignUpPayloadType from "../../types/SignUpPayloadType";
+import SignUpPayloadInitValues from "../../constants/SignUpPayloadInitValues";
 
-const SignUpForm = () => {
-  const [userDetails, setUserDetails] = useState<SignUpPayloadType>({
-    email: "",
-    title: "",
-    firstName: "",
-    lastName: "",
-    phoneNumber: "",
-    nic: "",
-    address: "",
-    password: "",
-    confirmPassword: "",
-  });
+const SignUpForm: FC = () => {
+  const [userDetails, setUserDetails] = useState<SignUpPayloadType>(
+    SignUpPayloadInitValues
+  );
+  const [inputHelperText, setInputHelperText] = useState<SignUpPayloadType>(
+    SignUpPayloadInitValues
+  );
   const [isPasswordShown, setIsPasswordShown] = useState<boolean>(false);
   const [isConfirmPasswordShown, setIsConfirmPasswordShown] =
     useState<boolean>(false);
@@ -37,6 +39,43 @@ const SignUpForm = () => {
     setIsConfirmPasswordShown((prev) => !prev);
   };
 
+  const handleFieldBlur = function (): void {
+    if (userDetails["email"] !== "" && !userDetails["email"].includes("@")) {
+      setInputHelperText((prev) => ({
+        ...prev,
+        email: "Please enter a valid email address!",
+      }));
+    }
+    if (userDetails["phoneNumber"] !== "") {
+      setInputHelperText((prev) => ({
+        ...prev,
+        phoneNumber: generatePhoneNumberErrorMessage(),
+      }));
+    }
+  };
+
+  const handleFieldChange = function (e: ChangeEvent<HTMLInputElement>): void {
+    setInputHelperText((prev) => ({ ...prev, [e.target.name]: "" }));
+    setUserDetails((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const generatePhoneNumberErrorMessage = function (): string {
+    if (userDetails["phoneNumber"][0] === "0") {
+      return "Please remove the leading zero!";
+    }
+    if (userDetails["phoneNumber"][0] === "+") {
+      return "Please remove the area code! (+94 etc.)";
+    }
+    if (userDetails["phoneNumber"].match(/[^0-9]/g)) {
+      return "Please enter a valid phone number!";
+    }
+    if (userDetails["phoneNumber"].length !== 9) {
+      return "Please enter a 9 digit phone number!";
+    }
+
+    return "";
+  };
+
   const handleLogInButtonClick = function (): void {
     navigate(config.routes.login);
   };
@@ -49,7 +88,17 @@ const SignUpForm = () => {
           Sign up to book instant appointments with expert physicians and
           doctors at your convenience.
         </p>
-        <TextField label="Email" type="text" name="email" sx={{ mt: 5 }} />
+        <TextField
+          label="Email"
+          type="text"
+          name="email"
+          value={userDetails["email"]}
+          onChange={handleFieldChange}
+          onBlur={handleFieldBlur}
+          sx={{ mt: 5 }}
+          error={inputHelperText["email"].length > 0}
+          helperText={inputHelperText["email"]}
+        />
         <Stack
           direction={{ xs: "column", sm: "row" }}
           justifyContent="space-between"
@@ -60,13 +109,21 @@ const SignUpForm = () => {
             label="First Name"
             type="text"
             name="firstName"
+            value={userDetails["firstName"]}
+            onChange={handleFieldChange}
             className={styles["sign-up-form__textfield"]}
+            error={inputHelperText["firstName"].length > 0}
+            helperText={inputHelperText["firstName"]}
           />
           <TextField
             label="Last Name"
             type="text"
             name="lastName"
+            value={userDetails["lastName"]}
+            onChange={handleFieldChange}
             className={styles["sign-up-form__textfield"]}
+            error={inputHelperText["lastName"].length > 0}
+            helperText={inputHelperText["lastName"]}
           />
         </Stack>
         <Stack
@@ -79,20 +136,44 @@ const SignUpForm = () => {
             label="Phone Number"
             type="text"
             name="phoneNumber"
+            value={userDetails["phoneNumber"]}
+            onChange={handleFieldChange}
+            onBlur={handleFieldBlur}
             className={styles["sign-up-form__textfield"]}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">(+94)</InputAdornment>
+              ),
+            }}
+            error={inputHelperText["phoneNumber"].length > 0}
+            helperText={inputHelperText["phoneNumber"]}
           />
           <TextField
             label="NIC"
             type="text"
             name="nic"
+            value={userDetails["nic"]}
+            onChange={handleFieldChange}
             className={styles["sign-up-form__textfield"]}
+            error={inputHelperText["nic"].length > 0}
+            helperText={inputHelperText["nic"]}
           />
         </Stack>
-        <TextField label="Address" type="text" name="address" />
+        <TextField
+          label="Address"
+          type="text"
+          name="address"
+          value={userDetails["address"]}
+          onChange={handleFieldChange}
+          error={inputHelperText["address"].length > 0}
+          helperText={inputHelperText["address"]}
+        />
         <TextField
           label="Password"
           type={isPasswordShown ? "text" : "password"}
           name="password"
+          value={userDetails["password"]}
+          onChange={handleFieldChange}
           InputProps={{
             endAdornment: (
               <IconButton edge="end" onClick={toggleShowPassword}>
@@ -101,11 +182,15 @@ const SignUpForm = () => {
             ),
           }}
           sx={{ mt: 3 }}
+          error={inputHelperText["password"].length > 0}
+          helperText={inputHelperText["password"]}
         />
         <TextField
           label="Confirm Password"
           type={isConfirmPasswordShown ? "text" : "password"}
           name="confirmPassword"
+          value={userDetails["confirmPassword"]}
+          onChange={handleFieldChange}
           InputProps={{
             endAdornment: (
               <IconButton edge="end" onClick={toggleShowConfirmPassword}>
@@ -117,6 +202,8 @@ const SignUpForm = () => {
               </IconButton>
             ),
           }}
+          error={inputHelperText["confirmPassword"].length > 0}
+          helperText={inputHelperText["confirmPassword"]}
         />
         <Button variant="contained" type="submit" sx={{ mt: 5 }}>
           Sign Up
