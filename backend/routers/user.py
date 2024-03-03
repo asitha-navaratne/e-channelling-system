@@ -85,7 +85,7 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
         title = create_user_request.title.value,
         first_name = create_user_request.first_name,
         last_name = create_user_request.last_name,
-        phone_number = create_user_request.phone_number,
+        phone_number = '+94' + create_user_request.phone_number,
         address = create_user_request.address,
         nic = create_user_request.nic,
         user_role = 'user',
