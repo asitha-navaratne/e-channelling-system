@@ -1,16 +1,17 @@
 import os
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from pydantic import BaseModel
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from passlib.context import CryptContext
 from typing import Annotated
 from sqlalchemy.orm import Session
 from jose import jwt, JWTError
 from dotenv import load_dotenv
 
+from helpers.create_access_token import create_access_token
 from database.models import User, Doctor
 from database.config import SessionLocal
+from classes.Token import Token
 
 from errors.auth_exceptions import credential_exception, authentication_exception
 
@@ -36,11 +37,6 @@ def get_db():
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
-## Types
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
 ## Helpers
 def authenticate(email: str, password: str, db: db_dependency):
     user = db.query(User).filter(User.email == email).first()
@@ -54,13 +50,6 @@ def authenticate(email: str, password: str, db: db_dependency):
         return {'email': doctor.email, 'id': doctor.id, 'user_role': 'doctor'}
     
     return False
-
-def create_access_token(email: str, user_id: int, user_role: str, expires_delta: timedelta):
-    encode = {'sub': email, 'id': user_id, 'role': user_role}
-    expires = datetime.now(tz=timezone.utc) + expires_delta
-    encode.update({'exp': expires})
-
-    return jwt.encode(encode, os.getenv("SECRET_KEY"), algorithm = os.getenv('ALGORITHM'))
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     try:

@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel
 from datetime import datetime, timezone
 from passlib.context import CryptContext
 from typing import Annotated
@@ -9,6 +8,9 @@ from sqlalchemy.orm import Session
 from .auth import get_current_user
 from database.models import Doctor
 from database.config import SessionLocal
+from classes.CreateDoctorRequest import CreateDoctorRequest
+from classes.ChangeDoctorRequest import ChangeDoctorRequest
+from classes.ChangePasswordRequest import ChangePasswordRequest
 
 from errors.auth_exceptions import authentication_exception, authorization_exception, password_mismatch_exception
 
@@ -29,26 +31,6 @@ def get_db():
 
 db_dependency = Annotated[Session, Depends(get_db)]
 token_dependency = Annotated[dict, Depends(get_current_user)]
-
-## Types
-class CreateDoctorRequest(BaseModel):
-    email: str
-    first_name: str
-    last_name: str
-    field: str
-    phone_number: str
-    address: str
-    nic: str
-    password: str
-
-class ChangeDoctorRequest(BaseModel):
-    phone_number: str
-    email: str
-
-class ChangePasswordRequest(BaseModel):
-    password: str
-    new_password: str
-    confirm_password: str
 
 ## Routes
 @router.get('/')

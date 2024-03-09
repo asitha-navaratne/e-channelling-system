@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends
 from datetime import datetime, timezone
 from typing import Annotated
-from pydantic import BaseModel
 from starlette import status
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
@@ -9,6 +8,7 @@ from sqlalchemy.orm import Session
 from .auth import get_current_user
 from database.models import Availability, Appointment
 from database.config import SessionLocal
+from classes.CreateAvailabilityRequest import CreateAvailabilityRequest
 
 from errors.auth_exceptions import authorization_exception
 from errors.data_exceptions import invalid_time_range_exception, time_slot_conflict_exception, existing_appointment_conflict_exception, invalid_datetime_exception
@@ -28,11 +28,6 @@ router = APIRouter(
     prefix='/availability',
     tags=['Availability']
 )
-
-## Types
-class CreateAvailabilityRequest(BaseModel):
-    start_time: datetime
-    end_time: datetime
 
 ## Routes
 @router.get('/')
