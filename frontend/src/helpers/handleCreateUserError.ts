@@ -14,7 +14,7 @@ const handleCreateUserError = function (
       passwordHelperText: "",
       errorMessage: err.response?.data.detail?.[0].msg,
     };
-  } else if (err.response?.data?.detail === "Email already exists!") {
+  } else if (err.response?.data?.detail === "Email already exists.") {
     return {
       emailHelperText: ValidationErrorMessages.EmailExistsMessage,
       passwordHelperText: "",

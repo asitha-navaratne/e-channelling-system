@@ -8,7 +8,7 @@ credential_exception = HTTPException(
     headers={"WWW-Authenticate": "Bearer"},
 )
 
-authentication_exception = HTTPException(
+incorrect_details_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED, 
     detail='Incorrect username or password.',
     headers={"WWW-Authenticate": "Bearer"},
@@ -23,5 +23,23 @@ authorization_exception = HTTPException(
 password_mismatch_exception = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST, 
     detail='New passwords do not match. Please make sure the new password and confirmation match.',
+    headers={"WWW-Authenticate": "Bearer"},
+)
+
+email_exists_exception = HTTPException(
+    status_code=status.HTTP_400_BAD_REQUEST, 
+    detail='Email already exists.',
+    headers={"WWW-Authenticate": "Bearer"},
+)
+
+empty_fields_exception = HTTPException(
+    status_code=status.HTTP_400_BAD_REQUEST, 
+    detail='Fields cannot be empty.',
+    headers={"WWW-Authenticate": "Bearer"},
+)
+
+phone_number_exception = HTTPException(
+    status_code=status.HTTP_400_BAD_REQUEST, 
+    detail='Phone number must be 9 digits in length.',
     headers={"WWW-Authenticate": "Bearer"},
 )

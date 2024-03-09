@@ -6,13 +6,14 @@ from starlette import status
 from sqlalchemy.orm import Session
 
 from .auth import get_current_user
+from helpers.validate_details import validate_details
 from database.models import User
 from database.config import SessionLocal
 from classes.CreateUserRequest import CreateUserRequest
 from classes.ChangeUserRequest import ChangeUserRequest
 from classes.ChangePasswordRequest import ChangePasswordRequest
 
-from errors.auth_exceptions import authentication_exception, authorization_exception, password_mismatch_exception
+from errors.auth_exceptions import incorrect_details_exception, authorization_exception, password_mismatch_exception, email_exists_exception
 
 
 router = APIRouter(
@@ -51,6 +52,13 @@ async def get_details(db: db_dependency, token: token_dependency):
 
 @router.post('/', status_code = status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
+    user = db.query(User).filter(User.email == create_user_request.email).first()
+
+    if user:
+        raise email_exists_exception
+    
+    validate_details(create_user_request)
+
     create_user_model = User(
         email = create_user_request.email,
         title = create_user_request.title.value,
@@ -73,6 +81,13 @@ async def edit_user(db: db_dependency, token: token_dependency, change_user_requ
     if token['role'] != 'user':
         raise authorization_exception
 
+    existing_user = db.query(User).filter(User.email == change_user_request.email).first()
+
+    if existing_user:
+        raise email_exists_exception
+    
+    validate_details(change_user_request)
+    
     user_model = db.query(User).filter(User.id == token['id']).first()
 
     user_model.email = change_user_request.email
@@ -91,7 +106,7 @@ async def change_password(db: db_dependency, token: token_dependency, change_pas
     user_model = db.query(User).filter(User.id == token['id']).first()
 
     if not bcrypt_context.verify(change_password_request.password, user_model.hashed_password):
-        raise authentication_exception
+        raise incorrect_details_exception
     
     if change_password_request.new_password != change_password_request.confirm_password:
         raise password_mismatch_exception

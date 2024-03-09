@@ -13,7 +13,7 @@ from database.models import User, Doctor
 from database.config import SessionLocal
 from classes.Token import Token
 
-from errors.auth_exceptions import credential_exception, authentication_exception
+from errors.auth_exceptions import credential_exception, incorrect_details_exception
 
 
 load_dotenv()
@@ -71,7 +71,7 @@ async def get_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], 
     details = authenticate(form_data.username, form_data.password, db)
 
     if not details:
-        raise authentication_exception
+        raise incorrect_details_exception
     
     token = create_access_token(details['email'], details['id'], details['user_role'], timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
 
