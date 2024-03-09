@@ -10,6 +10,11 @@ const config = {
 
     endpoints: {
       auth: "/auth/token",
+
+      user: {
+        createUser: "/user/",
+        changePassword: "/user/change-password",
+      },
     },
   },
 };

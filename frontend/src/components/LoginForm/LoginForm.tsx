@@ -14,7 +14,7 @@ import logo from "../../assets/logo.png";
 
 import config from "../../configs/urls.config";
 
-import LoginErrorMessageType from "../../types/LoginErrorMessageType";
+import AuthErrorMessageType from "../../types/AuthErrorMessageType";
 import ValidationErrorMessages from "../../constants/ValidationErrorMessages";
 
 const LoginForm: FC = () => {
@@ -25,7 +25,7 @@ const LoginForm: FC = () => {
   const [errorMessage, setErrorMessage] = useState<string>();
   const [isPasswordShown, setIsPasswordShown] = useState<boolean>(false);
 
-  const data = useActionData() as LoginErrorMessageType;
+  const data = useActionData() as AuthErrorMessageType;
   const navigate = useNavigate();
   const navigation = useNavigation();
 

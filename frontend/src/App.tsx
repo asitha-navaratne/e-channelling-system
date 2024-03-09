@@ -11,6 +11,7 @@ import Root from "./components/Root/Root";
 import { tokenLoader } from "./utils/auth";
 import loginLoader from "./views/LoginPage/LoginPage.loader";
 import loginAction from "./views/LoginPage/LoginPage.action";
+import signUpAction from "./views/SignUpPage/SignUpPage.action";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,7 @@ const router = createBrowserRouter([
     path: config.routes.signup,
     element: <SignUpPage />,
     id: "signup",
+    action: signUpAction,
   },
 ]);
 

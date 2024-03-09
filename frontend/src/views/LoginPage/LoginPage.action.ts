@@ -1,7 +1,7 @@
 import { redirect } from "react-router-dom";
 import { AxiosError, AxiosResponse } from "axios";
 
-import handleAuthError from "../../helpers/handleAuthError";
+import handleLoginError from "../../helpers/handleLoginError";
 
 import config from "../../configs/urls.config";
 import { GetAuthToken } from "../../service/AuthServices";
@@ -34,15 +34,13 @@ async function action({ request }: { request: Request }) {
   }
 
   const res: AxiosResponse<GetAuthTokenResponseType> &
-    AxiosError<ApiCallExceptionType> = await GetAuthToken(
-    email,
-    password
-  ).catch((err) => {
-    return err;
-  });
+    AxiosError<ApiCallExceptionType<{ email: string; password: string }>> =
+    await GetAuthToken(email, password).catch((err) => {
+      return err;
+    });
 
   if (res.name === "AxiosError") {
-    return handleAuthError(res);
+    return handleLoginError(res);
   }
 
   const token = res.data.access_token;
