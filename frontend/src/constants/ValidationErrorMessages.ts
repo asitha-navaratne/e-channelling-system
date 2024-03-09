@@ -9,6 +9,7 @@ enum ValidationErrorMessages {
   IncorrectCredentialsMessage = "Incorrect username or password.",
   PasswordsNotMatchingMessage = "Passwords do not match!",
   EmailExistsMessage = "Email already exists!",
+  ServerTimeoutMessage = "Server timed out. Please try again shortly!",
 }
 
 export default ValidationErrorMessages;

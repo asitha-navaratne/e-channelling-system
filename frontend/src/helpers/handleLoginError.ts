@@ -25,6 +25,12 @@ const handleLoginError = function (
       passwordHelperText: "",
       errorMessage: err.response?.data?.detail,
     };
+  } else if (err.message === "timeout of 5000ms exceeded") {
+    return {
+      emailHelperText: "",
+      passwordHelperText: "",
+      errorMessage: ValidationErrorMessages.ServerTimeoutMessage,
+    };
   }
 
   return {
