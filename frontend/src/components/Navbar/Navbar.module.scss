@@ -1,0 +1,11 @@
+.navbar {
+  &__logo {
+    height: 4vh;
+    margin-right: 1.5vw;
+  }
+
+  &__header {
+    color: #f1962e;
+    text-shadow: 2px 2px 10px #333;
+  }
+}

@@ -11,6 +11,13 @@ const theme = createTheme({
     },
   },
   components: {
+    MuiTypography: {
+      styleOverrides: {
+        h5: {
+          fontFamily: "Pacifico",
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: {

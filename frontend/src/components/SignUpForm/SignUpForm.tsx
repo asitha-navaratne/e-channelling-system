@@ -104,7 +104,11 @@ const SignUpForm: FC = () => {
   return (
     <Form method="POST" className={styles["sign-up-form"]}>
       <Stack paddingX={4}>
-        <img src={logo} className={styles["sign-up-form__logo"]} />
+        <img
+          src={logo}
+          alt="E-Channelling Logo"
+          className={styles["sign-up-form__logo"]}
+        />
         <p className={styles["sign-up-form__intro-text"]}>
           Sign up to book instant appointments with expert physicians and
           doctors at your convenience.

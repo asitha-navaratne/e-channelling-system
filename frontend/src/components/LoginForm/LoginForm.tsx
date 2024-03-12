@@ -66,7 +66,11 @@ const LoginForm: FC = () => {
   return (
     <Form method="POST" className={styles["login-form"]}>
       <Stack paddingX={4}>
-        <img src={logo} className={styles["login-form__logo"]} />
+        <img
+          src={logo}
+          alt="E-Channelling Logo"
+          className={styles["login-form__logo"]}
+        />
         <h2 className={styles["login-form__header"]}>Sign In</h2>
         <p className={styles["login-form__intro-text"]}>
           Unlock top-tier healthcare! Sign in for instant appointments with
