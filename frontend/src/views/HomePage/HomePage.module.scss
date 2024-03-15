@@ -1,0 +1,23 @@
+.home-page {
+  display: flex;
+  height: 93vh;
+
+  &__calendar-section {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+@media (orientation: landscape) {
+  .home-page {
+    height: 87vh;
+  }
+}
+
+@media (min-width: 1000px) and (orientation: landscape) {
+  .home-page {
+    height: 92vh;
+  }
+}
