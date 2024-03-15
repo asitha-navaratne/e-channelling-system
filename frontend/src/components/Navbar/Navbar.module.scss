@@ -1,4 +1,7 @@
 .navbar {
+  display: flex;
+  justify-content: center;
+
   &__logo {
     height: 4vh;
     margin-right: 1em;
@@ -13,12 +16,7 @@
 @media (max-width: 600px) {
   .navbar__logo {
     height: 5vh;
-  }
-}
-
-@media (orientation: landscape) {
-  .navbar__logo {
-    height: 4.4vw;
+    margin-right: 0.8em;
   }
 }
 
@@ -28,8 +26,22 @@
   }
 }
 
+@media (orientation: landscape) {
+  .navbar {
+    height: 13vh;
+
+    &__logo {
+      height: 4.4vw;
+    }
+  }
+}
+
 @media (min-width: 1000px) and (orientation: landscape) {
-  .navbar__logo {
-    height: 5vh;
+  .navbar {
+    height: 8vh;
+
+    &__logo {
+      height: 5vh;
+    }
   }
 }

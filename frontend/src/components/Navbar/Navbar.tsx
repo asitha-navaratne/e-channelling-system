@@ -5,7 +5,7 @@ import logo from "../../assets/logo.png";
 
 const Navbar = () => {
   return (
-    <AppBar position="sticky">
+    <AppBar position="sticky" className={styles["navbar"]}>
       <Toolbar>
         <img
           src={logo}
@@ -15,7 +15,7 @@ const Navbar = () => {
         <Typography
           variant="h5"
           className={styles["navbar__header"]}
-          sx={{ fontSize: { xs: "1rem", sm: "1.5rem" } }}
+          sx={{ fontSize: { xs: "1rem", sm: "1.2rem", md: "1.5rem" } }}
         >
           E-Channelling
         </Typography>
