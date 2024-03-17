@@ -1,3 +1,5 @@
+@use "../../styles/variables";
+
 .sign-up-form {
   width: 40vw;
   overflow-y: auto;
@@ -18,7 +20,7 @@
   }
 
   &__error-message {
-    color: #d32f2f;
+    color: variables.$error-color;
     font-weight: 400;
     margin: auto;
     text-align: center;
