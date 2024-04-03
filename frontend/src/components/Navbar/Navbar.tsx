@@ -13,6 +13,7 @@ const Navbar = () => {
           className={styles["navbar__logo"]}
         />
         <Typography
+          component="h2"
           variant="h5"
           className={styles["navbar__header"]}
           sx={{ fontSize: { xs: "1rem", sm: "1.2rem", md: "1.5rem" } }}

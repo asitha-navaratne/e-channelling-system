@@ -1,0 +1,180 @@
+@use "../../styles/variables";
+
+.calendar {
+  height: 33rem;
+  width: 30rem;
+  background-color: variables.$light-tile-color;
+  box-shadow: 0.5rem 0.5rem 2rem rgba(64, 64, 64, 0.2);
+
+  &__header {
+    padding: 0 0.5rem;
+    height: 30%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #333;
+    background-color: variables.$dark-tile-color;
+  }
+
+  &__header-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__current-month {
+    color: variables.$primary-color;
+    font-size: 3rem;
+    font-weight: 100;
+    margin-bottom: 0.5rem;
+  }
+
+  &__current-date {
+    margin-top: 0.4rem;
+  }
+
+  &__week-section {
+    height: 10%;
+    display: flex;
+    align-items: center;
+    padding: 0 0.3rem;
+
+    > p {
+      width: calc((100% - 0.3rem * 2) / 7);
+      display: flex;
+      justify-content: center;
+      font-weight: 100;
+      margin: 0 auto;
+    }
+  }
+
+  &__days-section {
+    height: 60%;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0 0.3rem;
+  }
+
+  &__day-container {
+    height: calc((100% - (0.2rem * 2 * 6)) / 8);
+    width: calc((100% - (0.2rem * 2 * 7)) / 8);
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 0.2rem solid transparent;
+    border-radius: 5px;
+
+    &:hover {
+      cursor: pointer;
+      background-color: variables.$background-color;
+      border: 0.2rem solid variables.$dark-tile-color;
+      transition: background-color 0.5s, border 0.3s;
+    }
+  }
+}
+
+@media (max-width: 300px) {
+  .calendar {
+    height: 18rem;
+    width: 15rem;
+
+    &__header-details {
+      font-size: 0.7rem;
+    }
+
+    &__current-month {
+      font-size: 1.8rem;
+    }
+
+    &__current-date {
+      margin-top: 0.2rem;
+    }
+
+    &__week-section {
+      font-size: 0.7rem;
+    }
+
+    &__day-container {
+      font-size: 0.6rem;
+    }
+  }
+}
+
+@media (min-width: 300px) and (max-width: 600px) {
+  .calendar {
+    height: 23rem;
+    width: 20rem;
+
+    &__header-details {
+      font-size: 0.8rem;
+    }
+
+    &__current-month {
+      font-size: 2rem;
+    }
+
+    &__week-section {
+      font-size: 0.8rem;
+    }
+
+    &__day-container {
+      font-size: 0.7rem;
+    }
+  }
+}
+
+@media (max-width: 1000px) and (orientation: landscape) {
+  .calendar {
+    height: 18rem;
+    width: 15rem;
+
+    &__header {
+      padding: 0 0.3rem;
+    }
+
+    &__header-details {
+      font-size: 0.7rem;
+    }
+
+    &__current-month {
+      font-size: 1.7rem;
+      margin-bottom: 0.3rem;
+    }
+
+    &__week-section {
+      font-size: 0.7rem;
+    }
+
+    &__day-container {
+      font-size: 0.6rem;
+    }
+  }
+}
+
+@media (max-width: 700px) and (orientation: landscape) {
+  .calendar {
+    height: 13rem;
+    width: 10rem;
+
+    &__header-details {
+      font-size: 0.5rem;
+    }
+
+    &__current-month {
+      font-size: 1rem;
+    }
+
+    &__current-date {
+      margin-top: 0.2rem;
+    }
+
+    &__week-section {
+      font-size: 0.5rem;
+    }
+
+    &__day-container {
+      font-size: 0.5rem;
+    }
+  }
+}
