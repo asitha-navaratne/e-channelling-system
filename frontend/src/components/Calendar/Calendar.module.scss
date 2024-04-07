@@ -2,13 +2,13 @@
 
 .calendar {
   height: 33rem;
-  width: 30rem;
+  width: 28rem;
   background-color: variables.$light-tile-color;
   box-shadow: 0.5rem 0.5rem 2rem rgba(64, 64, 64, 0.2);
 
   &__header {
     padding: 0 0.5rem;
-    height: 30%;
+    height: 25%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -24,7 +24,7 @@
 
   &__current-month {
     color: variables.$primary-color;
-    font-size: 3rem;
+    font-size: 2.6rem;
     font-weight: 100;
     margin-bottom: 0.5rem;
   }
@@ -49,7 +49,7 @@
   }
 
   &__days-section {
-    height: 60%;
+    height: 65%;
     display: flex;
     flex-wrap: wrap;
     padding: 0 0.3rem;
@@ -83,7 +83,7 @@
 
 @media (max-width: 300px) {
   .calendar {
-    height: 18rem;
+    height: 20rem;
     width: 15rem;
 
     &__header-details {
@@ -110,11 +110,11 @@
 
 @media (min-width: 300px) and (max-width: 600px) {
   .calendar {
-    height: 23rem;
+    height: 25rem;
     width: 20rem;
 
     &__header-details {
-      font-size: 0.8rem;
+      font-size: 0.7rem;
     }
 
     &__current-month {
@@ -134,18 +134,18 @@
 @media (max-width: 1000px) and (orientation: landscape) {
   .calendar {
     height: 18rem;
-    width: 15rem;
+    width: 13rem;
 
     &__header {
       padding: 0 0.3rem;
     }
 
     &__header-details {
-      font-size: 0.7rem;
+      font-size: 0.6rem;
     }
 
     &__current-month {
-      font-size: 1.7rem;
+      font-size: 1.5rem;
       margin-bottom: 0.3rem;
     }
 
@@ -161,7 +161,7 @@
 
 @media (max-width: 700px) and (orientation: landscape) {
   .calendar {
-    height: 13rem;
+    height: 14rem;
     width: 10rem;
 
     &__header-details {

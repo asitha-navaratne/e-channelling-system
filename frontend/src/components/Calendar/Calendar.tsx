@@ -51,7 +51,7 @@ const Calendar: FC = () => {
     date.getMonth() + 1,
     0
   ).getDay();
-  const remainingDays = 7 - lastDayIndex - 1;
+  const remainingDays = 14 - lastDayIndex - 1;
 
   const handlePreviousButtonClick = function (): void {
     const date = new Date(selectedDate);
