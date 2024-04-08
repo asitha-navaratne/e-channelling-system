@@ -5,6 +5,7 @@ import config from "./configs/urls.config";
 import HomePage from "./views/HomePage/HomePage";
 import LoginPage from "./views/LoginPage/LoginPage";
 import SignUpPage from "./views/SignUpPage/SignUpPage";
+import LandingPage from "./views/LandingPage/LandingPage";
 
 import Root from "./components/Root/Root";
 
@@ -40,6 +41,11 @@ const router = createBrowserRouter([
     id: "signup",
     loader: signUpLoader,
     action: signUpAction,
+  },
+  {
+    path: config.routes.landing,
+    element: <LandingPage />,
+    id: "landing",
   },
 ]);
 

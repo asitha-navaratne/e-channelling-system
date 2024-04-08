@@ -3,6 +3,8 @@ const config = {
     root: "/",
     login: "/login",
     signup: "/signup",
+
+    landing: "/main",
   },
 
   api: {
