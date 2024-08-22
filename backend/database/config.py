@@ -11,9 +11,9 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
 
-SQLALCHEMY_DATABASE_URL = DATABASE_URL % quote_plus(DATABASE_PASSWORD)
+POSTGRES_DATABASE_URL = DATABASE_URL % quote_plus(DATABASE_PASSWORD)
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(POSTGRES_DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

@@ -1,0 +1,80 @@
+@use "../../styles/variables";
+
+.landing-page {
+  height: 100vh;
+  width: 100vw;
+  background-color: #fff;
+
+  &__body-section {
+    height: 93vh;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__description-section {
+    width: 100%;
+  }
+
+  &__title {
+    color: variables.$text-color;
+    font-weight: 100;
+    font-size: 8vw;
+    text-transform: capitalize;
+    text-align: left;
+    margin-bottom: 4.5vh;
+
+    span {
+      color: variables.$primary-color;
+    }
+  }
+
+  &__description-text {
+    color: variables.$text-color;
+    margin-right: 20%;
+    text-align: justify;
+    font-size: 2.7vw;
+    font-weight: 100;
+  }
+}
+
+@media (orientation: landscape) {
+  .landing-page {
+    &__body-section {
+      height: 87vh;
+    }
+
+    &__title {
+      font-size: 4.2vw;
+    }
+
+    &__description-section {
+      width: 50%;
+      padding-right: 10px;
+    }
+
+    &__description-text {
+      font-size: 1.2vw;
+    }
+  }
+}
+
+@media (min-width: 1000px) and (orientation: landscape) {
+  .landing-page {
+    &__body-section {
+      height: 92vh;
+    }
+
+    &__title {
+      font-size: 4.2vw;
+    }
+
+    &__description-section {
+      width: 50%;
+      padding-right: 10px;
+    }
+
+    &__description-text {
+      font-size: 1vw;
+    }
+  }
+}
